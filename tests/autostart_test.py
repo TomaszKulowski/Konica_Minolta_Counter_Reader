@@ -1,7 +1,7 @@
 """
 The collections of the tests for the 'utils.autostart.py' module.
 """
-
+import winreg
 from pathlib import Path
 from unittest.mock import patch
 
@@ -56,3 +56,35 @@ def test_add_unsuccessful(mock_open_key: patch, mock_set_value_ex: patch, mock_c
     mock_open_key.assert_called_once()
     mock_set_value_ex.assert_called_once()
     mock_close_key.assert_called_once()
+
+
+@pytest.mark.parametrize('expected_result', (True, False))
+@patch('winreg.QueryValueEx')
+@patch('winreg.OpenKey')
+def test_app_exists_in_autostart(mock_open_key: patch, mock_query_value_ex: patch, expected_result: bool):
+    """
+    Test if an application exists in the Windows Autostart configuration.
+
+    Args:
+        mock_open_key (patch): A mock object for winreg.OpenKey.
+        mock_query_value_ex (patch): A mock object for winreg.QueryValueEx.
+        expected_result (bool): The expected result of the check, True if the
+            application exists, False if it does not.
+    """
+    mock_query_value_ex.return_value = expected_result
+    result = autostart.check('app_name.py')
+
+    assert result == expected_result
+
+
+@patch('winreg.OpenKey', side_effect=FileNotFoundError)
+def test_winreg_raise_error(mock_open_key: patch):
+    """
+    Test handling of an error when accessing the Windows Registry.
+
+    Args:
+        mock_open_key (patch): A mock object for winreg.OpenKey.
+    """
+    result = autostart.check('app_name.py')
+
+    assert result is False
