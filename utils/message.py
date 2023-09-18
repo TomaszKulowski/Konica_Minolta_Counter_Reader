@@ -4,7 +4,7 @@ It includes an 'Email' class with methods for creating and sending emails.
 """
 
 from email.message import EmailMessage
-from smtplib import SMTP, SMTP_SSL
+import smtplib
 
 
 class Email:
@@ -72,11 +72,11 @@ class Email:
             message (str): The body or content of the email.
         """
         if self.encryption.upper() == 'SSL':
-            with SMTP_SSL(self.smtp_server, self.port) as server:
+            with smtplib.SMTP_SSL(self.smtp_server, self.port) as server:
                 server.login(self.login, self.password)
                 server.send_message(self._create_message(title, message))
         else:
-            with SMTP(self.smtp_server, self.port) as server:
+            with smtplib.SMTP(self.smtp_server, self.port) as server:
                 if self.encryption.upper() == 'TLS':
                     server.starttls()
                 server.login(self.login, self.password)
