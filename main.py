@@ -30,6 +30,7 @@ from time import sleep
 from dotenv import load_dotenv
 
 from utils import autostart
+from utils.exceptions import CreateReportError
 from utils.message import Email
 from utils.printer import Device
 from utils.schedule import Schedule
@@ -72,9 +73,13 @@ def main():
         schedule = Schedule(int(getenv('SEND_INTERVAL')), getenv('NEXT_SEND'))
         schedule.call_every(getenv('SEND_EVERY').lower())
         if schedule.check_time():
-            with Device(getenv('PRINTER_IP')) as device:
-                serial_number = device.get_serial_number()
-                counter = device.get_counter()
+            try:
+                with Device(getenv('PRINTER_IP')) as device:
+                    serial_number = device.get_serial_number()
+                    counter = device.get_counter()
+            except CreateReportError:
+                sleep(60*60)  # wait 60 minutes and try to create report again
+                continue
 
             message = Email(
                 smtp_server=getenv('SMTP_SERVER'),
