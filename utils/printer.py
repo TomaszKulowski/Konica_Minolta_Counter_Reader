@@ -6,8 +6,8 @@ and serial numbers from a networked printer.
 
 import ipaddress
 
+import requests
 from bs4 import BeautifulSoup
-from requests import get
 
 from .exceptions import InvalidAddressError, ReportError, CreateReportError
 
@@ -78,7 +78,7 @@ class Device:
         Fetch the device statistics report from the device's web interface.
         """
         url = f'http://{self.ip_address}/cgi-bin/dynamic/printer/config/reports/devicestatistics.html'
-        page = get(url)
+        page = requests.get(url)
         if page.status_code == 200:
             self._report = page.text
             return
