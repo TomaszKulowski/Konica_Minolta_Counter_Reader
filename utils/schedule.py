@@ -72,7 +72,7 @@ class Schedule:
             bool: True if it's time for the next scheduled event, False otherwise.
         """
         current_time = getattr(datetime.now(), self.get_call_every())
-        if self.next_call == current_time:
+        if self.next_call <= current_time:
             relative = relativedelta()
             relative.day = 0
             relative.month = 0
