@@ -7,6 +7,8 @@ an application to the startup list and check if an application is in the startup
 from pathlib import Path
 import winreg
 
+from .exceptions import AddAutostartError
+
 
 def add(app_path: Path):
     """
@@ -27,6 +29,7 @@ def add(app_path: Path):
 
     except WindowsError:
         winreg.CloseKey(registry_key)
+        raise AddAutostartError
 
 
 def check(app_name: str) -> bool:

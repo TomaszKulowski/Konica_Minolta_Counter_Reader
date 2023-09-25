@@ -4,12 +4,12 @@ to retrieve printer statistics. It allows users to check various statistics such
 and serial numbers from a networked printer.
 """
 
-import socket
+import ipaddress
 
+import requests
 from bs4 import BeautifulSoup
-from requests import get
 
-from exceptions import InvalidAddressError, ReportError
+from .exceptions import InvalidAddressError, ReportError, CreateReportError
 
 
 class Device:
@@ -68,9 +68,9 @@ class Device:
             bool: True if the IP address is valid, False otherwise.
         """
         try:
-            socket.inet_aton(self.ip_address)
+            ipaddress.ip_address(self.ip_address)
             return True
-        except socket.error:
+        except ValueError:
             return False
 
     def create_report(self):
@@ -78,9 +78,11 @@ class Device:
         Fetch the device statistics report from the device's web interface.
         """
         url = f'http://{self.ip_address}/cgi-bin/dynamic/printer/config/reports/devicestatistics.html'
-        page = get(url)
+        page = requests.get(url)
         if page.status_code == 200:
             self._report = page.text
+            return
+        raise CreateReportError
 
     def get_counter(self) -> str:
         """

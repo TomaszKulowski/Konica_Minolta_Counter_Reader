@@ -28,13 +28,13 @@ class Schedule:
         check_time() -> bool:
             Check if it's time for the next scheduled event based on the set time interval and interval value.
     """
-    def __init__(self, interval: int, next_call: str):
+    def __init__(self, interval: int, next_call: int):
         """
         Initialize the Schedule object with the specified interval and next scheduled event time.
 
         Args:
             interval (int): The time interval in units of the specified time interval ('day', 'month', 'year').
-            next_call (str): The next scheduled event time in the format of the specified time interval.
+            next_call (int): The next scheduled event time in the format of the specified time interval.
         """
         self.periods_of_time = ['day', 'month', 'year']
         self.next_call = next_call
@@ -72,7 +72,7 @@ class Schedule:
             bool: True if it's time for the next scheduled event, False otherwise.
         """
         current_time = getattr(datetime.now(), self.get_call_every())
-        if self.next_call == current_time:
+        if self.next_call <= current_time:
             relative = relativedelta()
             relative.day = 0
             relative.month = 0
